@@ -1,0 +1,47 @@
+version: '3.1'
+
+services:
+  full_cycle_db:
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile
+    image: allanmilani/full_cycle_db
+    restart: always
+    container_name: full_cycle_db
+    environment:
+      - MARIADB_ROOT_PASSWORD=root
+    volumes:
+      - ./mysql/database:/var/lib/mysql
+    networks:
+      - full_cycle_networks
+    tty: true
+  full_cycle_node:
+    build:
+      context: ./node
+      dockerfile: Dockerfile
+    image: allanmilani/full_cycle_node
+    container_name: full_cycle_node
+    restart: unless-stopped
+    volumes:
+      - ./node:/html/app
+    networks:
+      - full_cycle_networks
+    depends_on:
+      - full_cycle_db
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: allanmilani/full_cycle_nginx
+    container_name: full_cycle_nginx
+    networks:
+      - full_cycle_networks
+    ports:
+      - 8081:80
+    depends_on:
+      - full_cycle_node
+      - full_cycle_db
+
+networks:
+  full_cycle_networks:
+    driver: bridge
