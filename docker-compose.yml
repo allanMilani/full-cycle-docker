@@ -21,6 +21,7 @@ services:
       dockerfile: Dockerfile
     image: allanmilani/full_cycle_node
     container_name: full_cycle_node
+    entrypoint: dockerize -wait tcp://full_cycle_db:3306 -timeout 20s docker-entrypoint.sh
     restart: unless-stopped
     volumes:
       - ./node:/html/app
